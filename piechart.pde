@@ -64,13 +64,13 @@ boolean inArc (float radian1, float radian2) {
  * Return -1 if the mouse is not currently in a slice
  */
 int getArcIndex () {
-    float lastAng = g_start;
+    float theta = g_start;
     if (! inCircle ()) { return -1; }
     for (int i = 0; i < g_radian.length; ++i) {
-        if (inArc (lastAng, lastAng + g_radian[i])) {
+        if (inArc (theta, theta + g_radian[i])) {
             return i;
         }
-        lastAng += g_radian[i];
+        theta += g_radian[i];
     }
     return -1;
 }
@@ -81,14 +81,16 @@ int getArcIndex () {
 void drawPie () {
 
     // tell the user how to navigate
-    float xpos = 0, ypos = 10;
+    float xpos = 0, ypos = TEXTSIZE;
     String msg = "Click any slice...";
     fill(LABCOLOR, pieAlpha);
+    textSize(TEXTSIZE);
     textAlign(LEFT);
     text (msg, xpos, ypos);
     noStroke ();
+    textSize(10); // reset for labels
 
-    float lastAng = g_start;
+    float theta = g_start;
     for (int i = 0; i < g_radian.length; i++){
         if (i == savedIndex) {
             // highlight the selected piece and show in the background
@@ -100,17 +102,17 @@ void drawPie () {
             fill(f, pieAlpha); 
         }
         arc(X_ORIGIN , Y_ORIGIN,
-              DIAMETER, DIAMETER, lastAng, lastAng + g_radian[i]);
+              DIAMETER, DIAMETER, theta, theta + g_radian[i]);
 
         // Place the label of the arc in the middle of the slice outside circle
-        float theta = lastAng + g_radian[i] / 2;
-        float lx = X_ORIGIN + (15 + DIAMETER / 2) * cos (theta);
-        float ly = Y_ORIGIN + (15 + DIAMETER / 2) * sin (theta);
+        float phi = theta + g_radian[i] / 2;
+        float lx = X_ORIGIN + (15 + DIAMETER / 2) * cos (phi);
+        float ly = Y_ORIGIN + (15 + DIAMETER / 2) * sin (phi);
         textAlign(CENTER);
         fill(LABCOLOR, pieAlpha);
         text (g_labs[i], lx, ly);
 
-        lastAng += g_radian[i];  
+        theta += g_radian[i];  
     }
 }
 
@@ -120,12 +122,14 @@ void drawPie () {
 void drawBar () {
 
     // tell the user how to navigate
-    float xpos = 0, ypos = 10;
+    float xpos = 0, ypos = TEXTSIZE;
     String msg = "Click to return...";
     fill(LABCOLOR, barAlpha);
+    textSize(TEXTSIZE); 
     textAlign(LEFT);
     text (msg, xpos, ypos);
     noStroke ();
+    textSize(10); // reset for labels
 
     float bottom = SIZE * (0.75 + (0.25 / 2));
     float left = SIZE - SIZE * (0.75 + (0.25 / 2));
@@ -161,14 +165,13 @@ void drawBar () {
     float binWidth = xsize / nbins;
     for (int i = 0; i < g_normal.length; ++i) {
         if (i == savedIndex) {
-            // Leave the active slice slightly visible in the bg
+            // Match the background slice with a highlighted bar
             stroke(0,barAlpha);
             strokeWeight(4);
             fill(255, barAlpha);
         } else {
             noStroke ();
-            //fill(255 * g_normal[i], barAlpha);
-            fill(75,barAlpha); // * g_normal[i], barAlpha);
+            fill(75,barAlpha); 
         }
         rect (x, bottom - g_normal[i]*ysize, binWidth, g_normal[i]*ysize);
         fill(255, barAlpha);
@@ -205,6 +208,7 @@ void handleTransition () {
 int BGCOLOR = 100;              // color of the canvas
 int LABCOLOR = 255;             // text color on top
 int SIZE = 500;                 // Outer dimensions of the canvas
+int TEXTSIZE = 20;              // Size of the message text
 float DIAMETER = SIZE * 0.75;   // Diameter of the circle
 float X_ORIGIN = SIZE / 2.0;    // centered x
 float Y_ORIGIN = SIZE / 2.0;    // centered y
@@ -214,9 +218,10 @@ float g_start = radians(0);     // Angle to start the 'slices' (in radians)
 
 // The original values of the pie 'slices'
 float[] g_values = {random(10,50), random(10,50), random(10,50), random(10,50)};
-String[] g_labs = {"A", "B", "C", "D"}; // names of the values above
 float[] g_normal;               // ... normalized to %
 float[] g_radian;               // ... mapped to radians
+String[] g_labs = {"A", "B", "C", "D"}; // names of the values above
+
 boolean inTransition = false;   // Currently transitioning between views?
 float pieAlpha = 100.0;         // How opaque is the pie chart
 float barAlpha = 0.0;           // How opaque is the bar chart

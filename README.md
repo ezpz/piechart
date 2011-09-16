@@ -5,7 +5,7 @@ A processing.js sketch to bridge the gap between pie charts and bar charts.
 ### Use
 
 You should be able to just load this into a processing editor and hit go.
-Alternatively, you can view the [online version here][http://www.openprocessing.org/visuals/?visualID=37563]
+Alternatively, you can view the online version here: http://www.openprocessing.org/visuals/?visualID=37563
 
 ### Rationale
 
